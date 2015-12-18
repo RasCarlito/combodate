@@ -19,7 +19,26 @@
 * Project page: http://github.com/vitalets/combodate
 * Copyright (c) 2012 Vitaliy Potapov. Released under MIT License.
 **/
-(function ($) {
+(function (root, factory) {
+    'use strict';
+
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery', 'moment'], function ($, moment) {
+            // Use globals variables in case that they are undefined locally
+            return factory($ || root.$ || root.jQuery, moment || root.moment);
+        });
+    }
+    else if (typeof exports === 'object') {
+        // Note. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports, like Node.
+        module.exports = factory(require('jquery'), require('moment'));
+    }
+    else {
+        // Browser globals
+        factory(root.jQuery, root.moment);
+    }
+}(this, function ($, moment) {
 
     var Combodate = function (element, options) {
         this.$element = $(element);
@@ -29,7 +48,7 @@
         }
         this.options = $.extend({}, $.fn.combodate.defaults, options, this.$element.data());
         this.init();
-     };
+    };
 
     Combodate.prototype = {
         constructor: Combodate,
@@ -327,14 +346,14 @@
                 }
 
                 if(isNaN(values[k])) {
-                   notSelected = true;
-                   return false;
+                    notSelected = true;
+                    return false;
                 }
             });
 
             //if at least one visible combo not selected - return empty string
             if(notSelected) {
-               return '';
+                return '';
             }
 
             //convert hours 12h --> 24h
@@ -361,9 +380,9 @@
 
             format = format === undefined ? this.options.format : format;
             if(format === null) {
-               return dt.isValid() ? dt : null;
+                return dt.isValid() ? dt : null;
             } else {
-               return dt.isValid() ? dt.format(format) : '';
+                return dt.isValid() ? dt.format(format) : '';
             }
         },
 
@@ -397,7 +416,7 @@
                 //read values from date object
                 $.each(this.map, function(k, v) {
                     if(k === 'ampm') {
-                       return;
+                        return;
                     }
                     values[k] = dt[v[1]]();
                 });
@@ -422,11 +441,11 @@
                     if(that['$'+k]) {
 
                         if(k === 'minute' && that.options.minuteStep > 1 && that.options.roundTime) {
-                           v = getNearest(that['$'+k], v);
+                            v = getNearest(that['$'+k], v);
                         }
 
                         if(k === 'second' && that.options.secondStep > 1 && that.options.roundTime) {
-                           v = getNearest(that['$'+k], v);
+                            v = getNearest(that['$'+k], v);
                         }
 
                         that['$'+k].val(v);
@@ -486,7 +505,7 @@
 
         //getValue returns date as string / object (not jQuery object)
         if(option === 'getValue' && this.length && (d = this.eq(0).data('combodate'))) {
-          return d.getValue.apply(d, args);
+            return d.getValue.apply(d, args);
         }
 
         return this.each(function () {
@@ -503,7 +522,7 @@
     };
 
     $.fn.combodate.defaults = {
-         //in this format value stored in original input
+        //in this format value stored in original input
         format: 'DD-MM-YYYY HH:mm',
         //in this format items in dropdowns are displayed
         template: 'D / MMM / YYYY   H : mm',
@@ -521,4 +540,4 @@
         smartDays: false // whether days in combo depend on selected month: 31, 30, 28
     };
 
-}(window.jQuery));
+}));
